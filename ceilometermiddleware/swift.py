@@ -44,6 +44,8 @@ before "proxy-server" and add the following filter in the file:
     send_queue_size = 1000
     # Logging level control
     log_level = WARNING
+    # to emit event for all http requests (PUT/POST/COPY/GET/HEAD/DELETE)
+    notify_api_count = False
 
     # All keystoneauth1 options can be set to query project name for
     # ignore_projects option, here is just a example:
@@ -179,6 +181,9 @@ class Swift(object):
         self.reseller_prefix = conf.get('reseller_prefix', 'AUTH_')
         if self.reseller_prefix and self.reseller_prefix[-1] != '_':
             self.reseller_prefix += '_'
+
+        self.notify_api_count = strutils.bool_from_string(
+            conf.get('notify_api_count', False))
 
         LOG.setLevel(getattr(logging, conf.get('log_level', 'WARNING')))
 
@@ -382,6 +387,15 @@ class Swift(object):
                 metric=cadf_metric.Metric(
                     name='storage.objects.outgoing.bytes', unit='B')))
 
+        # api calls
+        if self.notify_api_count:
+            request_metric_name = self.get_request_metric_name(method.lower())
+            if request_metric_name:
+                event.add_measurement(cadf_measurement.Measurement(
+                    result=1,
+                    metric=cadf_metric.Metric(
+                        name=request_metric_name, unit='request')))
+
         if self.nonblocking_notify:
             try:
                 Swift.event_queue.put(event, False)
@@ -403,6 +417,18 @@ class Swift(object):
     @staticmethod
     def send_notification(notifier, event):
         notifier.info({}, 'objectstore.http.request', event.as_dict())
+
+    @staticmethod
+    def get_request_metric_name(method):
+        request_metric_names = {
+            'get': 'storage.objects.get.count',
+            'post': 'storage.objects.post.count',
+            'put': 'storage.objects.put.count',
+            'copy': 'storage.objects.copy.count',
+            'delete': 'storage.objects.delete.count',
+            'head': 'storage.objects.head.count'
+        }
+        return request_metric_names.get(method, None)
 
 
 class SendEventThread(threading.Thread):
