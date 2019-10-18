@@ -58,11 +58,6 @@ before "proxy-server" and add the following filter in the file:
     password = a_big_secret
     interface = public
 """
-
-import eventlet
-eventlet.sleep()
-eventlet.monkey_patch()
-
 import datetime
 import functools
 import logging

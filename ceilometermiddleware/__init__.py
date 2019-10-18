@@ -13,6 +13,9 @@
 # under the License.
 
 import pbr.version
+import eventlet
+eventlet.sleep()
+eventlet.monkey_patch()
 
 
 __version__ = pbr.version.VersionInfo(
