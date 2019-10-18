@@ -13,7 +13,11 @@
 # under the License.
 
 import pbr.version
+import eventlet
 
 
 __version__ = pbr.version.VersionInfo(
     'ceilometermiddleware').version_string()
+
+eventlet.sleep()
+eventlet.monkey_patch()
