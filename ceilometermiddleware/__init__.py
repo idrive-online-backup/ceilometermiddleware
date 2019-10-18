@@ -14,9 +14,10 @@
 
 import pbr.version
 import eventlet
-eventlet.sleep()
-eventlet.monkey_patch()
 
 
 __version__ = pbr.version.VersionInfo(
     'ceilometermiddleware').version_string()
+
+eventlet.sleep()
+eventlet.monkey_patch()
