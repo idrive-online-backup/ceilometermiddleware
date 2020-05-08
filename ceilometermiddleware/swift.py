@@ -304,7 +304,7 @@ class Swift(object):
                     env.get('swift.source') != 'S3')):
             return
 
-        path = urlparse.quote(env['PATH_INFO'])
+        path = urlparse.quote(env.get('swift.backend_path', env['PATH_INFO']))
         method = env['REQUEST_METHOD']
         headers = {}
         for header in env:
