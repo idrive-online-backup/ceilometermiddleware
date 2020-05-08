@@ -301,7 +301,7 @@ class Swift(object):
                 env.get('HTTP_X_PROJECT_ID') or
                 env.get('HTTP_X_TENANT_ID')) in self.ignore_projects or
                 (env.get('swift.source') is not None and
-                    env.get('swift.source') != 'S3')):
+                    env.get('swift.source') not in ['SW', 'S3'])):
             return
 
         path = urlparse.quote(env.get('swift.backend_path', env['PATH_INFO']))
